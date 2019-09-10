@@ -72,16 +72,16 @@ int main() {
         time_point_2 = chrono::system_clock::now();
         chrono::duration<float> elapsedTime = time_point_2 - time_point_1;
         time_point_1 = time_point_2;
-        float fElapsedTime = elapsed.count();
+        float fElapsedTime = elapsedTime.count();
         
         
         // Controles
         // Handles rotations
         if (user_input == 'a')
-            fPlayerA -= (0.1f);
+            fPlayerA -= (0.1f) * fElapsedTime;
         
         if (user_input == 'd')
-            fPlayerA += (0.1f);
+            fPlayerA += (0.1f) * fElapsedTime;
         
         
         
