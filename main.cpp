@@ -51,14 +51,14 @@ int main() {
     map+= L"#..............#";
     map+= L"#..............#";
     map+= L"#..............#";
+    map+= L"#..........#...#";
+    map+= L"#..........#...#";
     map+= L"#..............#";
     map+= L"#..............#";
     map+= L"#..............#";
     map+= L"#..............#";
     map+= L"#..............#";
-    map+= L"#..............#";
-    map+= L"#..............#";
-    map+= L"#..............#";
+    map+= L"#.......########";
     map+= L"#..............#";
     map+= L"#..............#";
     map+= L"#..............#";
@@ -80,13 +80,19 @@ int main() {
         // Controles
         // Handles rotations
         if (user_input == 'a')
-            fPlayerA -= (0.1f) * fElapsedTime;
+            fPlayerA -= (0.5f) * fElapsedTime;
         
         if (user_input == 'd')
-            fPlayerA += (0.1f) * fElapsedTime;
-        
-        
-        
+            fPlayerA += (0.5f) * fElapsedTime;
+
+        if (user_input == 'w')
+            fPlayerX += sin(fPlayerA) * 5.0f * fElapsedTime;
+            fPlayerY += cos(fPlayerA) * 5.0f * fElapsedTime;
+
+        if (user_input == 's')
+            fPlayerX -= sin(fPlayerA) * 5.0f * fElapsedTime;
+            fPlayerY -= cos(fPlayerA) * 5.0f * fElapsedTime;
+
         for(int x=0; x < nScreenWidth; x++)
         {
             // For each column, calculate the projected ray angle into world space
@@ -141,7 +147,18 @@ int main() {
                 else if (y > nCeiling && y <=nFloor)
                     screen[y*nScreenWidth + x] = nShade;
                 else
-                    screen[y*nScreenWidth + x] = ' ';
+                {
+                    wchar_t nShadeFloor;
+                    // Shade floor based on distance
+                    float b = 1.0f - (((float)y - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
+                    if (b < 0.25)		nShadeFloor  = '#';
+                    else if (b < 0.5)	nShadeFloor  = 'x';
+                    else if (b < 0.75)	nShadeFloor  = '.';
+                    else if (b < 0.9)	nShadeFloor  = '-';
+                    else				nShadeFloor   = ' ';
+                    screen[y*nScreenWidth + x] = nShadeFloor;
+//                    screen[y*nScreenWidth + x] = ' ';
+                }
             }
 
 
