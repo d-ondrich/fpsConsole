@@ -42,10 +42,10 @@ int main() {
     refresh();
     int user_input;
     user_input = getch();
-    
+
     // Map
     wstring map;
-    
+
     map+= L"################";
     map+= L"#..............#";
     map+= L"#..............#";
@@ -64,10 +64,10 @@ int main() {
     map+= L"#..............#";
     map+= L"################";
     // end map
-    
+
     auto time_point_1 = chrono::system_clock::now();
     auto time_point_2 = chrono::system_clock::now();
-    
+
     // GAME LOOP
     while(1)
     {
@@ -75,42 +75,58 @@ int main() {
         chrono::duration<float> elapsedTime = time_point_2 - time_point_1;
         time_point_1 = time_point_2;
         float fElapsedTime = elapsedTime.count();
-        
-        
+
+
         // Controles
         // Handles rotations
         if (user_input == 'a')
             fPlayerA -= (0.5f) * fElapsedTime;
-        
+
         if (user_input == 'd')
             fPlayerA += (0.5f) * fElapsedTime;
 
-        if (user_input == 'w')
-            fPlayerX += sin(fPlayerA) * 5.0f * fElapsedTime;
-            fPlayerY += cos(fPlayerA) * 5.0f * fElapsedTime;
+        if (user_input == 'w') // Collision Detection Forwards
+        {
+          fPlayerX += sin(fPlayerA) * 5.0f * fElapsedTime;
+          fPlayerY += cos(fPlayerA) * 5.0f * fElapsedTime;
 
-        if (user_input == 's')
+          if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#')
+          {
             fPlayerX -= sin(fPlayerA) * 5.0f * fElapsedTime;
             fPlayerY -= cos(fPlayerA) * 5.0f * fElapsedTime;
+          }
+        }
+
+        if (user_input == 's') // Collision Detection Backwards
+        {
+          fPlayerX -= sin(fPlayerA) * 5.0f * fElapsedTime;
+          fPlayerY -= cos(fPlayerA) * 5.0f * fElapsedTime;
+
+          if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#')
+          {
+            fPlayerX += sin(fPlayerA) * 5.0f * fElapsedTime;
+            fPlayerY += cos(fPlayerA) * 5.0f * fElapsedTime;
+          }
+        }
 
         for(int x=0; x < nScreenWidth; x++)
         {
             // For each column, calculate the projected ray angle into world space
             float fRayAngle = (fPlayerA - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
-            
+
             float fDistanceToWall = 0;
             bool bHitWall = false;
-            
+
             float fEyeX = sin(fRayAngle); // unit vector for ray in player space
             float fEyeY = cos(fRayAngle);
-            
+
             while (!bHitWall && fDistanceToWall < fDepth)
             {
                 fDistanceToWall += 0.1f;
-                
+
                 int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall);
                 int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall);
-                
+
                 // Test if OOB
                 if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight)
                 {
@@ -126,7 +142,7 @@ int main() {
                     }
                 }
             }
-            
+
             // Calculate distance to ceiling and floor
             int nCeiling = (float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToWall);
             int nFloor = nScreenHeight - nCeiling;
@@ -143,7 +159,18 @@ int main() {
             for (int y=0; y<nScreenHeight; y++)
             {
                 if (y < nCeiling)
+                {
+//                    wchar_t nShadeCeiling;
+//                    // Shade floor based on distance
+//                    float b = 1.0f - (((float)y + nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
+//                    if (b < 0.25)		nShadeCeiling  = '#';
+//                    else if (b < 0.5)	nShadeCeiling  = 'x';
+//                    else if (b < 0.75)	nShadeCeiling  = '.';
+//                    else if (b < 0.9)	nShadeCeiling  = '-';
+//                    else				nShadeCeiling  = ' ';
+//                    screen[y*nScreenWidth + x] = nShadeCeiling;
                     screen[y*nScreenWidth + x] = ' ';
+                }
                 else if (y > nCeiling && y <=nFloor)
                     screen[y*nScreenWidth + x] = nShade;
                 else
