@@ -34,7 +34,7 @@ int main() {
     initscr();
     WINDOW* hconsole;
     hconsole = newwin(nScreenHeight, nScreenWidth, 0, 0);
-//    keypad(hconsole, true);
+    // keypad(hconsole, true);
     noecho();
     curs_set(0);
     wrefresh(hconsole);
